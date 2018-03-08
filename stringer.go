@@ -56,7 +56,7 @@
 // where t is the lower-cased name of the first type listed. It can be overridden
 // with the -output flag.
 //
-package stringer
+package main // import "golang.org/x/tools/cmd/stringer"
 
 import (
 	"bytes"
@@ -132,7 +132,7 @@ func main() {
 	g.Printf("\n")
 	g.Printf("package %s", g.pkg.name)
 	g.Printf("\n")
-	g.Printf("import \"strconv\" \"fmt\"\n") // Used by all methods.
+	g.Printf("import (\"strconv\"; \"fmt\")\n") // Used by all methods.
 
 	// Run generate for each type.
 	for _, typeName := range types {
@@ -585,15 +585,13 @@ const stringOneRun = `func (i %[1]s) String() string {
 	return _%[1]s_name[_%[1]s_index[i]:_%[1]s_index[i+1]]
 }
 
-func StringTo%[1]s(s string) %[1]s {
+func StringTo%[1]s(s string) (%[1]s, error) {
 	for i := 0; i < len(_%[1]s_index)-1; i++ {
 		if s == _%[1]s_name[_%[1]s_index[i]:_%[1]s_index[i+1]] {
-			return i, nil
+			return %[1]s(i), nil
 		}
 	}
-	err := fmt.Errorf("String %v is not a valid option for type %[1]s", str)
-	log.Print(err)
-	return 0, err
+	return 0, fmt.Errorf("String %%v is not a valid option for type %[1]s", s)
 }
 `
 
@@ -610,6 +608,15 @@ const stringOneRunWithOffset = `func (i %[1]s) String() string {
 		return "%[1]s(" + strconv.FormatInt(int64(i + %[2]s), 10) + ")"
 	}
 	return _%[1]s_name[_%[1]s_index[i] : _%[1]s_index[i+1]]
+}
+
+func StringTo%[1]s(s string) (%[1]s, error) {
+	for i := 0; i < len(_%[1]s_index)-1; i++ {
+		if s == _%[1]s_name[_%[1]s_index[i]:_%[1]s_index[i+1]] {
+			return %[1]s(i + %[2]s), nil
+		}
+	}
+	return 0, fmt.Errorf("String %%v is not a valid option for type %[1]s", s)
 }
 `
 
