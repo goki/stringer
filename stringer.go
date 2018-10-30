@@ -585,13 +585,14 @@ const stringOneRun = `func (i %[1]s) String() string {
 	return _%[1]s_name[_%[1]s_index[i]:_%[1]s_index[i+1]]
 }
 
-func StringTo%[1]s(s string) (%[1]s, error) {
-	for i := 0; i < len(_%[1]s_index)-1; i++ {
-		if s == _%[1]s_name[_%[1]s_index[i]:_%[1]s_index[i+1]] {
-			return %[1]s(i), nil
+func (i *%[1]s) FromString(s string) error {
+	for j := 0; j < len(_%[1]s_index)-1; j++ {
+		if s == _%[1]s_name[_%[1]s_index[j]:_%[1]s_index[j+1]] {
+			*i = %[1]s(j)
+            return nil
 		}
 	}
-	return 0, fmt.Errorf("String %%v is not a valid option for type %[1]s", s)
+	return fmt.Errorf("String %%v is not a valid option for type %[1]s", s)
 }
 `
 
