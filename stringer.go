@@ -132,7 +132,8 @@ func main() {
 	g.Printf("\n")
 	g.Printf("package %s", g.pkg.name)
 	g.Printf("\n")
-	g.Printf("import (\"strconv\"; \"fmt\")\n") // Used by all methods.
+	g.Printf("import (\"strconv\"; \"errors\")\n") // Used by all methods.
+	g.Printf("var _ = errors.New(\"dummy error\")\n")
 
 	// Run generate for each type.
 	for _, typeName := range types {
@@ -592,7 +593,7 @@ func (i *%[1]s) FromString(s string) error {
             return nil
 		}
 	}
-	return fmt.Errorf("String %%v is not a valid option for type %[1]s", s)
+	return errors.New("String: " + s + " is not a valid option for type: %[1]s")
 }
 `
 
@@ -617,7 +618,7 @@ func StringTo%[1]s(s string) (%[1]s, error) {
 			return %[1]s(i + %[2]s), nil
 		}
 	}
-	return 0, fmt.Errorf("String %%v is not a valid option for type %[1]s", s)
+	return 0, errors.New("String: " + s + " is not a valid option for type: %[1]s")
 }
 `
 
